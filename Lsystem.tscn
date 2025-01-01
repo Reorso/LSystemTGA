@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bvqnqm4ilbfmi"]
+
+[ext_resource type="Script" path="res://LsystemGenerator.gd" id="1_ly84p"]
+
+[node name="Lsystem" type="Node2D"]
+position = Vector2(500, 600)
+script = ExtResource("1_ly84p")
+rules = {
+"F": "F[-F][+F]F"
+}
+iterations = 7
