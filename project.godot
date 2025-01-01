@@ -14,3 +14,7 @@ config/name="LSystem"
 run/main_scene="res://Lsystem.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/ridiculous_coding/plugin.cfg")
