@@ -1,10 +1,26 @@
 @tool
 extends MeshInstance3D
 
-var rings = 50
-var radial_segments = 50
-var radius = 1
-var mid_lenght = 10
+@export var rings = 50:
+	set(value):
+		rings = value
+		_ready()  # <-- this runs whenever you change `radius` in the Inspector
+
+@export var radial_segments = 50:
+	set(value):
+		radial_segments = value
+		_ready()  # <-- this runs whenever you change `radius` in the Inspector
+
+@export var radius = 1:
+	set(value):
+		radius = value
+		_ready()  # <-- this runs whenever you change `radius` in the Inspector
+
+@export var mid_lenght = 10:
+	set(value):
+		mid_lenght = value
+		_ready()  # <-- this runs whenever you change `radius` in the Inspector
+
 
 func _ready():
 	
@@ -51,20 +67,20 @@ func createSphere(surface_array):
 	for i in range(rings + 1):
 		var v = float(i) / rings
 		var w = sin(PI * v)
-		var y = cos(PI * v) + offset
+		var y = cos(PI * v)
 		
 		# Loop over segments in ring.
 		for j in range(radial_segments + mid_lenght + 1):
 			var u = float(j) / radial_segments
 			var x = sin(u * PI * 2.0)
 			var z = cos(u * PI * 2.0)
-			var vert = Vector3(x * radius * w, y * radius, z * radius * w)
+			var vert = Vector3(x * radius * w + offset, y * radius, z * radius * w)
 			if (j>(radial_segments/2) && j < ((radial_segments/2)+mid_lenght)):
 				u = float(j) / radial_segments
 				x = sin(u * PI * 2.0)
 				z = cos(u * PI * 2.0)
 				offset+=0.1
-				vert = Vector3(x * radius * w, (y + offset) * radius, z * radius * w)
+				vert = Vector3(x  * radius * w + offset, y * radius, z * radius * w)
 
 			verts.append(vert)
 			normals.append(vert.normalized())
