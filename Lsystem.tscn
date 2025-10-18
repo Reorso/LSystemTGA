@@ -5,7 +5,10 @@
 [node name="Lsystem" type="Node2D"]
 position = Vector2(500, 600)
 script = ExtResource("1_ly84p")
+axiom = "X"
 rules = {
-"F": "F[-F][+F]F"
+"F": "F[-F][+F]",
+"T": "TT-[-T+T+T]+[+T-T-T]",
+"X": "F-[[X]+X]+F[+FX]-X"
 }
-iterations = 7
+iterations = 5

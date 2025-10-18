@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://boat3tn765slo"]
+
+[node name="MeshGeneration" type="Node2D"]

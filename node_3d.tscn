@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3 uid="uid://crlbdfjoodfao"]
+
+[ext_resource type="Script" uid="uid://r3d0cnalrfv6" path="res://LsystemGenerator.gd" id="1_7cd1y"]
+[ext_resource type="Texture2D" uid="uid://byrv11yclax7k" path="res://icon.svg" id="2_a0tk4"]
+[ext_resource type="Script" uid="uid://ci1icruxmi10t" path="res://GenerateMesh.gd" id="2_noarx"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_noarx"]
+albedo_color = Color(1.353256, 0, 0, 1)
+albedo_texture = ExtResource("2_a0tk4")
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_a0tk4"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, -1.7484555e-07, 0, 1, 0, 1.7484555e-07, 0, 1, 0, 0, 0.48942506)
+current = true
+fov = 39.6417
+near = 0.058
+
+[node name="Node3D" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.25212008)
+script = ExtResource("1_7cd1y")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_noarx")
+mesh = SubResource("ArrayMesh_a0tk4")
+skeleton = NodePath("../Node3D")
+script = ExtResource("2_noarx")

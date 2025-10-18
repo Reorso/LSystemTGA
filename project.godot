@@ -11,8 +11,8 @@ config_version=5
 [application]
 
 config/name="LSystem"
-run/main_scene="res://Lsystem.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+run/main_scene="res://node_3d.tscn"
+config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [editor_plugins]
