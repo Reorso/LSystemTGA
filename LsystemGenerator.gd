@@ -20,7 +20,7 @@ func _ready():
 		current_string = apply_rules(current_string)
 		print_debug("current iteration, content: ", i, current_string)
 	generate_meshes(current_string)
-	emit_signal("draw")  # Request a redraw
+	#emit_signal("draw")  # Request a redraw
 
 func apply_rules(string: String) -> String:
 	var new_string: String = ""

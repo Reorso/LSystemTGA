@@ -1,12 +1,30 @@
+@tool
 extends MeshInstance3D
 
 var rings = 50
 var radial_segments = 50
 var radius = 1
+var mid_lenght = 10
 
 func _ready():
+	
+	print("reloaded")
+
 	var surface_array = []
 	surface_array.resize(Mesh.ARRAY_MAX)
+
+	surface_array = createSphere(surface_array)
+	mesh = ArrayMesh.new()
+	#var new_mesh = load("res://sphere.tres")
+#	mesh = new_mesh
+	print_debug("this is the mesh: ", mesh)
+	# No blendshapes, lods, or compression used.
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
+	# Saves mesh to a .tres file with compression enabled.
+	
+	#ResourceSaver.save(mesh, "res://sphere.tres", ResourceSaver.FLAG_COMPRESS)
+
+func createSphere(surface_array):
 
 	# PackedVector**Arrays for mesh construction.
 	var verts = PackedVector3Array()
@@ -24,23 +42,30 @@ func _ready():
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_INDEX] = indices
 
-# Vertex indices.
+	# Vertex indices.
 	var thisrow = 0
 	var prevrow = 0
 	var point = 0
-
+	var offset = 0
 	# Loop over rings.
 	for i in range(rings + 1):
 		var v = float(i) / rings
 		var w = sin(PI * v)
-		var y = cos(PI * v)
-
+		var y = cos(PI * v) + offset
+		
 		# Loop over segments in ring.
-		for j in range(radial_segments + 1):
+		for j in range(radial_segments + mid_lenght + 1):
 			var u = float(j) / radial_segments
 			var x = sin(u * PI * 2.0)
 			var z = cos(u * PI * 2.0)
 			var vert = Vector3(x * radius * w, y * radius, z * radius * w)
+			if (j>(radial_segments/2) && j < ((radial_segments/2)+mid_lenght)):
+				u = float(j) / radial_segments
+				x = sin(u * PI * 2.0)
+				z = cos(u * PI * 2.0)
+				offset+=0.1
+				vert = Vector3(x * radius * w, (y + offset) * radius, z * radius * w)
+
 			verts.append(vert)
 			normals.append(vert.normalized())
 			uvs.append(Vector2(u, v))
@@ -58,9 +83,39 @@ func _ready():
 
 		prevrow = thisrow
 		thisrow = point
+	return surface_array
+ 
+func createTriangles(surface_array):
+	# PackedVector**Arrays for mesh construction.
+	var verts = PackedVector3Array()
+	var uvs = PackedVector2Array()
+	var normals = PackedVector3Array()
+	var indices = PackedInt32Array()
 
-	# No blendshapes, lods, or compression used.
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
-	# Saves mesh to a .tres file with compression enabled.
-	
-	ResourceSaver.save(mesh, "res://sphere.tres", ResourceSaver.FLAG_COMPRESS)
+
+	## Insert code here to generate mesh ##
+	var startPoint = Vector3(0,0,0)
+	var dimension = Vector2(10,10)
+	var resolution = 1
+
+	for i in range(dimension.y):
+		for g in range(dimension.x):
+			var vert = Vector3 (0,0,0)
+			vert.x = i * resolution + startPoint.x
+			vert.z = g * resolution + startPoint.z
+			vert.y = 0
+			verts.append(vert)
+			normals.append(vert.normalized())
+			uvs.append(Vector2(i,g))
+			if g < dimension.y-2 and i < dimension.x-2:
+				indices.append(i*g+i)
+				indices.append(i*g+i+1)
+				indices.append(i*g+i+2)
+
+
+	# Assign arrays to surface array.
+	surface_array[Mesh.ARRAY_VERTEX] = verts
+	surface_array[Mesh.ARRAY_TEX_UV] = uvs
+	surface_array[Mesh.ARRAY_NORMAL] = normals
+	surface_array[Mesh.ARRAY_INDEX] = indices
+	return surface_array
