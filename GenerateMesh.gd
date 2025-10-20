@@ -62,17 +62,20 @@ func _ready():
 func createSphere():
 	var totOffset = 0
 	# Loop over rings.
-	for lat in range(rings + mid_lenght + 1):
-		var y = float(lat) / (rings - offset)
+	for lat in range(rings + 1):
+		var y = float(lat) / rings
 		var x = sin(PI * y) 
-		var z = cos(PI * y) - (totOffset * offset)
-		if(lat >= rings/2 && lat < (rings/2)+mid_lenght):
-			totOffset+=1
+		var z = cos(PI * y) - ((totOffset) * offset)
+		if(lat == rings/2):
+			for k in range(mid_lenght):
+				createRing(y,x,z - (k * offset), lat+k)
+			totOffset = mid_lenght - 1
+		else:
+			createRing(y, x,z, lat+totOffset)
 		# Loop over segments in ring.
-		createRing(y, x,z, lat)
 	return surface_array
  
-func createRing(y,x,z,lat):
+func createRing(y,x,z,finalLat):
 	for lon in range(radial_segments + 1):
 		var y2 = float(lon) / radial_segments
 		var x2 = sin(y2 * PI * 2.0)
@@ -84,14 +87,14 @@ func createRing(y,x,z,lat):
 		uvs.append(Vector2(y2, y))
 
 		# Create triangles in ring using indices.
-		if lat > 0 and lon > 0:
-			indices.append(((lat-1)*(radial_segments+1)) + lon - 1)
-			indices.append(((lat-1)*(radial_segments+1)) + lon)
-			indices.append(((lat)*(radial_segments+1)) + lon - 1)
+		if finalLat > 0 and lon > 0:
+			indices.append(((finalLat-1)*(radial_segments+1)) + lon - 1)
+			indices.append(((finalLat-1)*(radial_segments+1)) + lon)
+			indices.append(((finalLat)*(radial_segments+1)) + lon - 1)
 
-			indices.append(((lat-1)*(radial_segments+1)) + lon)
-			indices.append(((lat)*(radial_segments+1)) + lon)
-			indices.append(((lat)*(radial_segments+1)) + lon - 1)
+			indices.append(((finalLat-1)*(radial_segments+1)) + lon)
+			indices.append(((finalLat)*(radial_segments+1)) + lon)
+			indices.append(((finalLat)*(radial_segments+1)) + lon - 1)
 
 func createTriangles(surface_array):
 	# PackedVector**Arrays for mesh construction.
