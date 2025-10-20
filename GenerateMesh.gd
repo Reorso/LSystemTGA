@@ -20,16 +20,35 @@ extends MeshInstance3D
 	set(value):
 		mid_lenght = value
 		_ready()  # <-- this runs whenever you change `radius` in the Inspector
+		
+@export var offset = 0.1:
+	set(value):
+		offset = value
+		_ready()  # <-- this runs whenever you change `radius` in the Inspector
+
+		# PackedVector**Arrays for mesh construction.
+var verts
+var uvs
+var normals
+var indices
+var surface_array
 
 
 func _ready():
 	
 	print("reloaded")
-
-	var surface_array = []
+	surface_array = []
 	surface_array.resize(Mesh.ARRAY_MAX)
-
-	surface_array = createSphere(surface_array)
+	verts = PackedVector3Array()
+	uvs = PackedVector2Array()
+	normals = PackedVector3Array()
+	indices = PackedInt32Array()
+	# Assign arrays to surface array.
+	surface_array[Mesh.ARRAY_VERTEX] = verts
+	surface_array[Mesh.ARRAY_TEX_UV] = uvs
+	surface_array[Mesh.ARRAY_NORMAL] = normals
+	surface_array[Mesh.ARRAY_INDEX] = indices
+	createSphere()
 	mesh = ArrayMesh.new()
 	#var new_mesh = load("res://sphere.tres")
 #	mesh = new_mesh
@@ -40,73 +59,42 @@ func _ready():
 	
 	#ResourceSaver.save(mesh, "res://sphere.tres", ResourceSaver.FLAG_COMPRESS)
 
-func createSphere(surface_array):
-
-	# PackedVector**Arrays for mesh construction.
-	var verts = PackedVector3Array()
-	var uvs = PackedVector2Array()
-	var normals = PackedVector3Array()
-	var indices = PackedInt32Array()
-
-	#######################################
-	## Insert code here to generate mesh ##
-	#######################################
-
-	# Assign arrays to surface array.
-	surface_array[Mesh.ARRAY_VERTEX] = verts
-	surface_array[Mesh.ARRAY_TEX_UV] = uvs
-	surface_array[Mesh.ARRAY_NORMAL] = normals
-	surface_array[Mesh.ARRAY_INDEX] = indices
-
-	# Vertex indices.
-	var thisrow = 0
-	var prevrow = 0
-	var point = 0
-	var offset = 0
+func createSphere():
+	var totOffset = 0
 	# Loop over rings.
-	for i in range(rings + 1):
-		var v = float(i) / rings
-		var w = sin(PI * v)
-		var y = cos(PI * v)
-		
+	for lat in range(rings + mid_lenght + 1):
+		var y = float(lat) / (rings - offset)
+		var x = sin(PI * y) 
+		var z = cos(PI * y) - (totOffset * offset)
+		if(lat >= rings/2 && lat < (rings/2)+mid_lenght):
+			totOffset+=1
 		# Loop over segments in ring.
-		for j in range(radial_segments + mid_lenght + 1):
-			var u = float(j) / radial_segments
-			var x = sin(u * PI * 2.0)
-			var z = cos(u * PI * 2.0)
-			var vert = Vector3(x * radius * w + offset, y * radius, z * radius * w)
-			if (j>(radial_segments/2) && j < ((radial_segments/2)+mid_lenght)):
-				u = float(j) / radial_segments
-				x = sin(u * PI * 2.0)
-				z = cos(u * PI * 2.0)
-				offset+=0.1
-				vert = Vector3(x  * radius * w + offset, y * radius, z * radius * w)
-
-			verts.append(vert)
-			normals.append(vert.normalized())
-			uvs.append(Vector2(u, v))
-			point += 1
-
-			# Create triangles in ring using indices.
-			if i > 0 and j > 0:
-				indices.append(prevrow + j - 1)
-				indices.append(prevrow + j)
-				indices.append(thisrow + j - 1)
-
-				indices.append(prevrow + j)
-				indices.append(thisrow + j)
-				indices.append(thisrow + j - 1)
-
-		prevrow = thisrow
-		thisrow = point
+		createRing(y, x,z, lat)
 	return surface_array
  
+func createRing(y,x,z,lat):
+	for lon in range(radial_segments + 1):
+		var y2 = float(lon) / radial_segments
+		var x2 = sin(y2 * PI * 2.0)
+		var z2 = cos(y2 * PI * 2.0)
+		var vert = Vector3(x2 * x , z , z2 * x) * radius
+
+		verts.append(vert)
+		normals.append(vert.normalized())
+		uvs.append(Vector2(y2, y))
+
+		# Create triangles in ring using indices.
+		if lat > 0 and lon > 0:
+			indices.append(((lat-1)*(radial_segments+1)) + lon - 1)
+			indices.append(((lat-1)*(radial_segments+1)) + lon)
+			indices.append(((lat)*(radial_segments+1)) + lon - 1)
+
+			indices.append(((lat-1)*(radial_segments+1)) + lon)
+			indices.append(((lat)*(radial_segments+1)) + lon)
+			indices.append(((lat)*(radial_segments+1)) + lon - 1)
+
 func createTriangles(surface_array):
 	# PackedVector**Arrays for mesh construction.
-	var verts = PackedVector3Array()
-	var uvs = PackedVector2Array()
-	var normals = PackedVector3Array()
-	var indices = PackedInt32Array()
 
 
 	## Insert code here to generate mesh ##
